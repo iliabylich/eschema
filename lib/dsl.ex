@@ -43,21 +43,18 @@ defmodule Schema.DSL do
     {:traverse, path, {:custom, custom_rule}}
   end
 
-  def int? do
-    {:predicate, :int?}
-  end
+  ## Primitive type checks
 
-  def lt?(value) do
-    {:predicate, :lt?, value}
-  end
+  def atom?,    do: {:predicate, :atom?}
+  def float?,   do: {:predicate, :float?}
+  def list?,    do: {:predicate, :list?}
+  def binary?,  do: {:predicate, :binary?}
+  def map?,     do: {:predicate, :map?}
+  def boolean?, do: {:predicate, :boolean?}
+  def integer?, do: {:predicate, :integer?}
+  def tuple?,   do: {:predicate, :tuple?}
 
-  def filled? do
-    {:predicate, :filled?}
-  end
-
-  def str? do
-    {:predicate, :str?}
-  end
+  ## Boolean operators
 
   def left && right do
     {:conjunction, left, right}
@@ -75,11 +72,20 @@ defmodule Schema.DSL do
     {:exclusive_disjunction, left, right}
   end
 
-  def none? do
-    {:predicate, :none?}
-  end
+  ## Predefined checks
 
-  def eql?(value) do
-    {:predicate, :eql?, value}
-  end
+  def none?,                 do: {:predicate, :none?}
+  def eql?(value),           do: {:predicate, :eql?, value}
+  def empty?,                do: {:predicate, :empty?}
+  def filled?,               do: {:predicate, :filled?}
+  def gt?(value),            do: {:predicate, :gt?, value}
+  def gteq?(value),          do: {:predicate, :gteq?, value}
+  def lt?(value),            do: {:predicate, :lt?, value}
+  def lteq?(value),          do: {:predicate, :lteq?, value}
+  def max_size?(value),      do: {:predicate, :max_size?, value}
+  def min_size?(value),      do: {:predicate, :min_size?, value}
+  def size?(value),          do: {:predicate, :size?, value}
+  def format?(value),        do: {:predicate, :format?, value}
+  def included_in?(value),   do: {:predicate, :included_in?, value}
+  def excluded_from?(value), do: {:predicate, :excluded_from?, value}
 end

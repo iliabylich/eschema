@@ -10,16 +10,14 @@ defmodule TestSchema do
   custom Custom
 
   ## Type checks
-  key :int,       do: int?()
-  key :str,       do: str?()
-  # key :float,     do: float?
-  # key :decimal,   do: decimal?
-  # key :bool,      do: bool?
-  # key :date,      do: date?
-  # key :time,      do: time?
-  # key :date_time, do: date_time?
-  # key :array,     do: array?
-  # key :hash,      do: hash?
+  key :atom,      do: atom?()
+  key :float,     do: float?()
+  key :list,      do: list?()
+  key :binary,    do: binary?()
+  key :map,       do: map?()
+  key :boolean,   do: boolean?()
+  key :integer,   do: integer?()
+  key :tuple,     do: tuple?()
 
   ## Boolean operations
   key :and, do: :left && :right
@@ -31,8 +29,20 @@ defmodule TestSchema do
   key :custom,    do: :custom_predicate?
 
   ## Predefined checks
-  key :none, do: none?()
-  key :eql, do: eql?(5)
+  key :none,          do: none?()
+  key :eql,           do: eql?(1)
+  key :empty,         do: empty?()
+  key :filled,        do: filled?()
+  key :gt,            do: gt?(2)
+  key :gteq,          do: gteq?(3)
+  key :lt,            do: lt?(4)
+  key :lteq,          do: lteq?(5)
+  key :max_size,      do: max_size?(6)
+  key :min_size,      do: min_size?(7)
+  key :size,          do: size?(8)
+  key :format,        do: format?(~r/\w+/)
+  key :included_in,   do: included_in?(9..10)
+  key :excluded_from, do: excluded_from?(11..12)
 end
 
 
