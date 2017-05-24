@@ -3,36 +3,38 @@ defmodule DryValidationTest do
 
   test "the truth" do
     assert TestSchema.rules == [
-      {:traverse, :atom,          {:predicate, :atom?}},
-      {:traverse, :float,         {:predicate, :float?}},
-      {:traverse, :list,          {:predicate, :list?}},
-      {:traverse, :binary,        {:predicate, :binary?}},
-      {:traverse, :map,           {:predicate, :map?}},
-      {:traverse, :boolean,       {:predicate, :boolean?}},
-      {:traverse, :integer,       {:predicate, :integer?}},
-      {:traverse, :tuple,         {:predicate, :tuple?}},
+      {:rule, {:predicate, :atom?}},
+      {:rule, {:predicate, :float?}},
+      {:rule, {:predicate, :list?}},
+      {:rule, {:predicate, :binary?}},
+      {:rule, {:predicate, :map?}},
+      {:rule, {:predicate, :boolean?}},
+      {:rule, {:predicate, :integer?}},
+      {:rule, {:predicate, :tuple?}},
 
-      {:traverse, :and,           {:conjunction, :left, :right}},
-      {:traverse, :or,            {:disjunction, :left, :right}},
-      {:traverse, :if,            {:implication, :left, :right}},
-      {:traverse, :xor,           {:exclusive_disjunction, :left, :right}},
+      {:rule, {:conjunction, :left, :right}},
+      {:rule, {:disjunction, :left, :right}},
+      {:rule, {:implication, :left, :right}},
+      {:rule, {:exclusive_disjunction, :left, :right}},
 
-      {:traverse, :custom,        {:custom, :custom_predicate?}},
+      {:rule, :custom_predicate?},
 
-      {:traverse, :none,          {:predicate, :none?}},
-      {:traverse, :eql,           {:predicate, :eql?, 1}},
-      {:traverse, :empty,         {:predicate, :empty?}},
-      {:traverse, :filled,        {:predicate, :filled?}},
-      {:traverse, :gt,            {:predicate, :gt?, 2}},
-      {:traverse, :gteq,          {:predicate, :gteq?, 3}},
-      {:traverse, :lt,            {:predicate, :lt?, 4}},
-      {:traverse, :lteq,          {:predicate, :lteq?, 5}},
-      {:traverse, :max_size,      {:predicate, :max_size?, 6}},
-      {:traverse, :min_size,      {:predicate, :min_size?, 7}},
-      {:traverse, :size,          {:predicate, :size?, 8}},
-      {:traverse, :format,        {:predicate, :format?, ~r/\w+/}},
-      {:traverse, :included_in,   {:predicate, :included_in?, 9..10}},
-      {:traverse, :excluded_from, {:predicate, :excluded_from?, 11..12}}
+      {:rule, {:predicate, :none?}},
+      {:rule, {:predicate, :eql?, 1}},
+      {:rule, {:predicate, :empty?}},
+      {:rule, {:predicate, :filled?}},
+      {:rule, {:predicate, :gt?, 2}},
+      {:rule, {:predicate, :gteq?, 3}},
+      {:rule, {:predicate, :lt?, 4}},
+      {:rule, {:predicate, :lteq?, 5}},
+      {:rule, {:predicate, :max_size?, 6}},
+      {:rule, {:predicate, :min_size?, 7}},
+      {:rule, {:predicate, :size?, 8}},
+      {:rule, {:predicate, :format?, ~r/\w+/}},
+      {:rule, {:predicate, :included_in?, 9..10}},
+      {:rule, {:predicate, :excluded_from?, 11..12}},
+
+      {:rule, {:traverse, :key, {:predicate, :eql?, "value"}}}
     ]
   end
 end

@@ -22,25 +22,19 @@ defmodule Schema.DSL do
     end
   end
 
-  defmacro key(path, do: block) do
-    quote do
-      rule = traverse(unquote(path), unquote(block))
-      @rules @rules ++ [rule]
-    end
-  end
-
   defmacro custom(module) do
     quote do
       @customs @customs ++ [unquote(module)]
     end
   end
 
-  def traverse(path, rule) when is_tuple(rule) do
-    {:traverse, path, rule}
-  end
+  ## High-level rules
 
-  def traverse(path, custom_rule) when is_atom(custom_rule) do
-    {:traverse, path, {:custom, custom_rule}}
+  defmacro rule(do: block) do
+    quote do
+      rule = {:rule, unquote(block)}
+      @rules @rules ++ [rule]
+    end
   end
 
   ## Primitive type checks
@@ -88,4 +82,18 @@ defmodule Schema.DSL do
   def format?(value),        do: {:predicate, :format?, value}
   def included_in?(value),   do: {:predicate, :included_in?, value}
   def excluded_from?(value), do: {:predicate, :excluded_from?, value}
+
+  ## Traversing
+
+  defmacro traverse(path, do: block) do
+    IO.inspect path
+    IO.inspect block
+    quote do
+      {:traverse, unquote(path), unquote(block)}
+    end
+  end
+
+  def has_key?(key) do
+    {:predicate, :has_key?, key}
+  end
 end
