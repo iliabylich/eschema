@@ -108,4 +108,12 @@ defmodule Schema.DSL do
       rule do: has_key?(unquote(key)) > traverse(unquote(key), do: unquote(block))
     end
   end
+
+  ## Nested schemas support
+
+  defmacro schema?(schema) do
+    quote do
+      map?() > {:predicate, :schema, unquote(schema)}
+    end
+  end
 end
