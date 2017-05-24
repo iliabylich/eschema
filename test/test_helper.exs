@@ -46,6 +46,15 @@ defmodule TestSchema do
 
   ## Traversing
   rule do: traverse :key, do: eql?("value")
+
+  ## Defining rules
+  rule do: binary?() > eql?("value")
+  rule do: has_key?(:req) && traverse(:req, do: gt?(3)) # Equivalent to `required :req, do: gt?(3)
+  rule do: has_key?(:opt) > traverse(:opt, do: gt?(4))  # Equivalent to `optional :opt, do: gt?(4)
+
+  ## Builtin rules
+  required :req, do: gt?(3)
+  optional :opt, do: gt?(4)
 end
 
 

@@ -34,7 +34,14 @@ defmodule DryValidationTest do
       {:rule, {:predicate, :included_in?, 9..10}},
       {:rule, {:predicate, :excluded_from?, 11..12}},
 
-      {:rule, {:traverse, :key, {:predicate, :eql?, "value"}}}
+      {:rule, {:traverse, :key, {:predicate, :eql?, "value"}}},
+
+      {:rule, {:implication, {:predicate, :binary?}, {:predicate, :eql?, "value"}}},
+      {:rule, {:conjunction, {:predicate, :has_key?, :req}, {:traverse, :req, {:predicate, :gt?, 3}}}},
+      {:rule, {:implication, {:predicate, :has_key?, :opt}, {:traverse, :opt, {:predicate, :gt?, 4}}}},
+
+      {:rule, {:conjunction, {:predicate, :has_key?, :req}, {:traverse, :req, {:predicate, :gt?, 3}}}},
+      {:rule, {:implication, {:predicate, :has_key?, :opt}, {:traverse, :opt, {:predicate, :gt?, 4}}}},
     ]
   end
 end

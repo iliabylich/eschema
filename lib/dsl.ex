@@ -86,8 +86,6 @@ defmodule Schema.DSL do
   ## Traversing
 
   defmacro traverse(path, do: block) do
-    IO.inspect path
-    IO.inspect block
     quote do
       {:traverse, unquote(path), unquote(block)}
     end
@@ -95,5 +93,19 @@ defmodule Schema.DSL do
 
   def has_key?(key) do
     {:predicate, :has_key?, key}
+  end
+
+  ## Builtin high-level rules
+
+  defmacro required(key, do: block) do
+    quote do
+      rule do: has_key?(unquote(key)) && traverse(unquote(key), do: unquote(block))
+    end
+  end
+
+  defmacro optional(key, do: block) do
+    quote do
+      rule do: has_key?(unquote(key)) > traverse(unquote(key), do: unquote(block))
+    end
   end
 end
