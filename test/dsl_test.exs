@@ -65,6 +65,9 @@ defmodule Schema.DSLTest do
     ## Nested schemas
     required :user, do: map?() > {:predicate, :schema, NestedSchema}
     required :user, do: schema?(NestedSchema)
+
+    ## Arrays
+    required :user_ids, do: each do: integer?()
   end
 
   test "the truth" do
@@ -110,7 +113,9 @@ defmodule Schema.DSLTest do
       {:rule, {:implication, {:predicate, :has_key?, :opt}, {:traverse, :opt, {:predicate, :gt?, 4}}}},
 
       {:rule, {:conjunction, {:predicate, :has_key?, :user}, {:traverse, :user, {:implication, {:predicate, :map?}, {:predicate, :schema, NestedSchema}}}}},
-      {:rule, {:conjunction, {:predicate, :has_key?, :user}, {:traverse, :user, {:implication, {:predicate, :map?}, {:predicate, :schema, NestedSchema}}}}}
+      {:rule, {:conjunction, {:predicate, :has_key?, :user}, {:traverse, :user, {:implication, {:predicate, :map?}, {:predicate, :schema, NestedSchema}}}}},
+
+      {:rule, {:conjunction, {:predicate, :has_key?, :user_ids}, {:traverse, :user_ids, {:implication, {:predicate, :list?}, {:predicate, :each, {:predicate, :integer?}}}}}}
     ]
   end
 end

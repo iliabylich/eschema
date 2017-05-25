@@ -116,4 +116,12 @@ defmodule Schema.DSL do
       map?() > {:predicate, :schema, unquote(schema)}
     end
   end
+
+  ## Arrays
+
+  defmacro each(do: block) do
+    quote do
+      list?() > {:predicate, :each, unquote(block)}
+    end
+  end
 end
