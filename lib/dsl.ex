@@ -1,4 +1,4 @@
-defmodule Schema.DSL do
+defmodule ESchema.DSL do
   import Kernel, except: [&&: 2, ||: 2, >: 2, ^: 2]
 
   defmacro __using__(_options) do
@@ -7,9 +7,9 @@ defmodule Schema.DSL do
       @customs []
 
       import Kernel, except: [&&: 2, ||: 2, >: 2]
-      import Schema.DSL
+      import ESchema.DSL
 
-      @before_compile Schema.DSL
+      @before_compile ESchema.DSL
     end
   end
 
@@ -113,7 +113,7 @@ defmodule Schema.DSL do
 
   defmacro schema?(schema) do
     quote do
-      map?() > {:predicate, :schema, unquote(schema)}
+      map?() > {:schema, unquote(schema)}
     end
   end
 
@@ -121,7 +121,7 @@ defmodule Schema.DSL do
 
   defmacro each(do: block) do
     quote do
-      list?() > {:predicate, :each, unquote(block)}
+      list?() > {:each, unquote(block)}
     end
   end
 end

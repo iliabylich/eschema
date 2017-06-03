@@ -1,8 +1,8 @@
-defmodule DryValidation.Mixfile do
+defmodule ESchema.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :dry_validation,
+    [app: :eschema,
      version: "0.1.0",
      elixir: "~> 1.4",
      build_embedded: Mix.env == :prod,

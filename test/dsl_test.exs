@@ -1,11 +1,11 @@
-defmodule Schema.DSLTest do
+defmodule ESchema.DSLTest do
   use ExUnit.Case
 
   defmodule NestedSchema do
   end
 
   defmodule TestSchema do
-    use Schema.DSL
+    use ESchema.DSL
 
     defmodule Custom do
       def custom_predicate?(value) do
@@ -63,7 +63,7 @@ defmodule Schema.DSLTest do
     optional :opt, do: gt?(4)
 
     ## Nested schemas
-    required :user, do: map?() > {:predicate, :schema, NestedSchema}
+    required :user, do: map?() > {:schema, NestedSchema}
     required :user, do: schema?(NestedSchema)
 
     ## Arrays
@@ -112,10 +112,10 @@ defmodule Schema.DSLTest do
       {:rule, {:conjunction, {:predicate, :has_key?, :req}, {:traverse, :req, {:predicate, :gt?, 3}}}},
       {:rule, {:implication, {:predicate, :has_key?, :opt}, {:traverse, :opt, {:predicate, :gt?, 4}}}},
 
-      {:rule, {:conjunction, {:predicate, :has_key?, :user}, {:traverse, :user, {:implication, {:predicate, :map?}, {:predicate, :schema, NestedSchema}}}}},
-      {:rule, {:conjunction, {:predicate, :has_key?, :user}, {:traverse, :user, {:implication, {:predicate, :map?}, {:predicate, :schema, NestedSchema}}}}},
+      {:rule, {:conjunction, {:predicate, :has_key?, :user}, {:traverse, :user, {:implication, {:predicate, :map?}, {:schema, NestedSchema}}}}},
+      {:rule, {:conjunction, {:predicate, :has_key?, :user}, {:traverse, :user, {:implication, {:predicate, :map?}, {:schema, NestedSchema}}}}},
 
-      {:rule, {:conjunction, {:predicate, :has_key?, :user_ids}, {:traverse, :user_ids, {:implication, {:predicate, :list?}, {:predicate, :each, {:predicate, :integer?}}}}}}
+      {:rule, {:conjunction, {:predicate, :has_key?, :user_ids}, {:traverse, :user_ids, {:implication, {:predicate, :list?}, {:each, {:predicate, :integer?}}}}}}
     ]
   end
 end
