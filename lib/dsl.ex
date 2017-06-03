@@ -77,8 +77,8 @@ defmodule ESchema.DSL do
   def lteq?(value)          when is_number(value),  do: {:predicate, :lteq?, value}
   def max_size?(value)      when is_integer(value), do: {:predicate, :max_size?, value}
   def min_size?(value)      when is_integer(value), do: {:predicate, :min_size?, value}
-  def size?(value)          when is_integer(value), do: {:predicate, :size?, value}
-  def size?(%Range{} = value),                      do: {:predicate, :size?, value}
+  def size?(value)          when is_integer(value), do: {:predicate, :size_exactly?, value}
+  def size?(%Range{} = value),                      do: {:predicate, :size_between?, value}
   def format?(value),                               do: {:predicate, :format?, value}
   def included_in?(value)   when is_list(value),    do: {:predicate, :included_in?, value}
   def excluded_from?(value) when is_list(value),    do: {:predicate, :excluded_from?, value}

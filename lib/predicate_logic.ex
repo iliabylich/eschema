@@ -14,32 +14,24 @@ defmodule ESchema.PredicateLogic do
 
   ## Predefined checks
 
-  def none?(value) when value == nil, do: true
-  def none?(_), do: false
+  def none?(value), do: value == nil
 
-  def eql?(value, cmp) when value == cmp, do: true
-  def eql?(_, _), do: false
+  def eql?(value, cmp), do: value == cmp
 
-  def empty?(value) when value == "" or value == [] or value == %{}, do: true
-  def empty?(_), do: false
+  def empty?(value), do: value == "" or value == [] or value == %{}
 
-  def filled?(value) when not(value == nil or value == "" or value == [] or value == %{}), do: true
-  def filled?(_), do: false
+  def filled?(value), do: value != nil and value != "" and value != [] and value != %{}
 
-  def gt?(value, cmp) when is_number(value) and value >  cmp, do: true
-  def gt?(value, cmp) when is_number(value) and value <= cmp, do: false
+  def gt?(value, cmp) when is_number(value), do: value > cmp
   def gt?(value, _), do: raise "gt? can compare only numbers (got #{inspect(value)})"
 
-  def gteq?(value, cmp) when is_number(value) and value >= cmp, do: true
-  def gteq?(value, cmp) when is_number(value) and value <  cmp, do: false
+  def gteq?(value, cmp) when is_number(value), do: value >= cmp
   def gteq?(value, _), do: raise "gteq? can compare only numbers (got #{inspect(value)})"
 
-  def lt?(value, cmp) when is_number(value) and value <  cmp, do: true
-  def lt?(value, cmp) when is_number(value) and value >= cmp, do: false
+  def lt?(value, cmp) when is_number(value), do: value < cmp
   def lt?(value, _), do: raise "lt? can compare only numbers (got #{inspect(value)})"
 
-  def lteq?(value, cmp) when is_number(value) and value <= cmp, do: true
-  def lteq?(value, cmp) when is_number(value) and value >  cmp, do: false
+  def lteq?(value, cmp) when is_number(value), do: value <= cmp
   def lteq?(value, _), do: raise "lteq? can compare only numbers (got #{inspect(value)})"
 
   def max_size?(value, size) when is_list(value), do: length(value) <= size
@@ -50,12 +42,14 @@ defmodule ESchema.PredicateLogic do
   def min_size?(value, size) when is_binary(value), do: String.length(value) >= size
   def min_size?(value, _), do: raise "min_size? is supported only by list and binary (got #{inspect(value)})"
 
+  def size_exactly?(value, size) when is_binary(value) or is_list(value), do: _length(value) == size
+  def size_exactly?(value, _), do: raise "size? is supported only by list and binary (got #{inspect(value)})"
 
-  def size?(value, size) when is_list(value)   and is_integer(size), do: length(value) == size
-  def size?(value, size) when is_binary(value) and is_integer(size), do: String.length(value) == size
-  def size?(value, %Range{} = size) when is_list(value),   do: Enum.member?(size, length(value))
-  def size?(value, %Range{} = size) when is_binary(value), do: Enum.member?(size, String.length(value))
-  def size?(value, _), do: raise "size? is supported only by list and binary (got #{inspect(value)})"
+  def size_between?(value, range) when is_binary(value) or is_list(value), do: Enum.member?(range, _length(value))
+  def size_between?(value, _), do: raise "size? is supported only by list and binary (got #{inspect(value)})"
+
+  defp _length(string) when is_binary(string), do: String.length(string)
+  defp _length(list)   when is_list(list),     do: length(list)
 
   def format?(value, regex) when is_binary(value), do: Regex.match?(regex, value)
   def format?(value, _), do: raise "format? is supported only by binary (got #{inspect(value)})"

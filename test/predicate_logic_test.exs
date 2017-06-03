@@ -263,17 +263,31 @@ defmodule ESchema.PredicateLogicTest do
     end
   end
 
-  test "size?(value, size)" do
-    refute P.size?("123", 2)
-    assert P.size?("123", 3)
-    refute P.size?("123", 4)
+  test "size_exactly?(value, size)" do
+    refute P.size_exactly?("123", 2)
+    assert P.size_exactly?("123", 3)
+    refute P.size_exactly?("123", 4)
 
-    refute P.size?([1, 2, 3], 2)
-    assert P.size?([1, 2, 3], 3)
-    refute P.size?([1, 2, 3], 4)
+    refute P.size_exactly?([1, 2, 3], 2)
+    assert P.size_exactly?([1, 2, 3], 3)
+    refute P.size_exactly?([1, 2, 3], 4)
 
     assert_raise RuntimeError, "size? is supported only by list and binary (got %{})", fn ->
-      P.size?(%{}, 1)
+      P.size_exactly?(%{}, 1)
+    end
+  end
+
+  test "size_between?(value, size)" do
+    refute P.size_between?("123", 0..2)
+    assert P.size_between?("123", 2..4)
+    refute P.size_between?("123", 4..5)
+
+    refute P.size_between?([1, 2, 3], 0..2)
+    assert P.size_between?([1, 2, 3], 2..4)
+    refute P.size_between?([1, 2, 3], 4..5)
+
+    assert_raise RuntimeError, "size? is supported only by list and binary (got %{})", fn ->
+      P.size_between?(%{}, 0..2)
     end
   end
 

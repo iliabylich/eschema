@@ -45,9 +45,10 @@ defmodule ESchema.DSLTest do
     rule do: max_size?(6)
     rule do: min_size?(7)
     rule do: size?(8)
+    rule do: size?(9..10)
     rule do: format?(~r/\w+/)
-    rule do: included_in?([9, 10])
-    rule do: excluded_from?([11, 12])
+    rule do: included_in?([11])
+    rule do: excluded_from?([12])
 
     ## Traversing
     rule do: traverse :key, do: eql?("value")
@@ -96,10 +97,11 @@ defmodule ESchema.DSLTest do
       {:rule, {:predicate, :lteq?, 5}},
       {:rule, {:predicate, :max_size?, 6}},
       {:rule, {:predicate, :min_size?, 7}},
-      {:rule, {:predicate, :size?, 8}},
+      {:rule, {:predicate, :size_exactly?, 8}},
+      {:rule, {:predicate, :size_between?, (9..10)}},
       {:rule, {:predicate, :format?, ~r/\w+/}},
-      {:rule, {:predicate, :included_in?, [9, 10]}},
-      {:rule, {:predicate, :excluded_from?, [11, 12]}},
+      {:rule, {:predicate, :included_in?, [11]}},
+      {:rule, {:predicate, :excluded_from?, [12]}},
 
       {:rule, {:traverse, :key, {:predicate, :eql?, "value"}}},
 
