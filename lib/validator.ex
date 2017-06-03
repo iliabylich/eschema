@@ -22,7 +22,7 @@ defmodule ESchema.Validator do
     end
 
     %{traversed: traversed, errors: errors} = visit(rule, value)
-    traversed = [key, traversed]
+    traversed = [:traverse, key, traversed]
     %{traversed: traversed, errors: errors}
   end
 
@@ -88,6 +88,18 @@ defmodule ESchema.Validator do
     schema.rules
     |> Enum.map(fn({:rule, rule}) -> visit(rule, params) end)
     |> merge
+  end
+
+  ## Arrays
+
+  defp visit({:each, rule}, list) do
+    result = list
+    |> Enum.map(fn(item) -> visit(rule, item) end)
+    |> merge
+
+    %{traversed: traversed, errors: errors} = result
+
+    %{traversed: [:each, traversed], errors: errors}
   end
 
   defp merge(items) do

@@ -1,4 +1,6 @@
 defmodule ESchema.ValidatorTest do
+  alias ESchema.Validator
+
   defmodule ProfileSchema do
     use ESchema.DSL
 
@@ -18,7 +20,7 @@ defmodule ESchema.ValidatorTest do
     required :email, do: binary?() && format?(~r/\A\w+@\w+\.com/)
     required :password, do: binary?() && size?(8..10)
     optional :profile, do: schema?(ProfileSchema)
-    # optional :tags, do: each do: binary?()
+    optional :tags, do: each do: binary?()
     # optional :friends, do: each do: schema?(FriendSchema)
   end
 
@@ -26,16 +28,16 @@ defmodule ESchema.ValidatorTest do
 
   test "plain valid params" do
     params = %{"email" => "email@email.com", "password" => "password"}
-    assert ESchema.Validator.call(UserSchema, params) == {:ok, %{email: "email@email.com", password: "password"}}
+    assert Validator.call(UserSchema, params) == {:ok, %{email: "email@email.com", password: "password"}}
   end
 
   test "nested valid params" do
     params = %{"email" => "email@email.com", "password" => "password", "profile" => %{"name" => "Name", "age" => 35}}
-    assert ESchema.Validator.call(UserSchema, params) == {:ok, %{email: "email@email.com", password: "password", profile: %{name: "Name", age: 35}}}
+    assert Validator.call(UserSchema, params) == {:ok, %{email: "email@email.com", password: "password", profile: %{name: "Name", age: 35}}}
   end
 
-  # test "it returns {:error, errors} when params are invalid" do
-  #   params = %{"email" => "not-an-email", "password" => "short"}
-  #   assert Schema.Validator.call(UserSchema, params) == {:error, [[:email, :invalid_format], [:password, :too_short]]}
-  # end
+  test "nested arrays of primitives" do
+    params = %{"email" => "email@email.com", "password" => "password", "tags" => ["a", "b"]}
+    assert Validator.call(UserSchema, params) == {:ok, %{email: "email@email.com", password: "password", tags: ["a", "b"]}}
+  end
 end

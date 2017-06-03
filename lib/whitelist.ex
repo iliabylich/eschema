@@ -9,7 +9,7 @@ defmodule ESchema.Whitelist do
     Map.merge(visit(head, params), visit(tail, params))
   end
 
-  defp visit([key | nested], params) when is_atom(key) do
+  defp visit([:traverse, key, nested], params) when is_atom(key) do
     value = if Map.has_key?(params, key) do
       Map.get(params, key)
     else
