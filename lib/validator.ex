@@ -2,36 +2,8 @@ defmodule ESchema.Validator do
   def call(schema, params) do
     schema.rules
     |> Enum.map(fn({:rule, rule}) -> visit(rule, params) end)
-    |> merge_result
+    |> merge
     |> to_result(params)
-  end
-
-  defp visit({:conjunction, left, right}, params) do
-    %{traversed: traversed_by_left, errors: errors_by_left} = visit(left, params)
-
-    if errors_by_left == [] do
-      %{traversed: traversed_by_right, errors: errors_by_right} = visit(right, params)
-
-      traversed = traversed_by_left ++ traversed_by_right
-      errors = errors_by_right
-      %{traversed: traversed, errors: errors}
-    else
-      %{traversed: traversed_by_left, errors: errors_by_left}
-    end
-  end
-
-  defp visit({:implication, left, right}, params) do
-    %{traversed: traversed_by_left, errors: errors_by_left} = visit(left, params)
-
-    if errors_by_left == [] do
-      %{traversed: traversed_by_right, errors: errors_by_right} = visit(right, params)
-
-      traversed = traversed_by_left ++ traversed_by_right
-      errors = errors_by_right
-      %{traversed: traversed, errors: errors}
-    else
-      %{traversed: traversed_by_left, errors: []}
-    end
   end
 
   defp visit({:predicate, :has_key?, key}, params) do
@@ -56,42 +28,65 @@ defmodule ESchema.Validator do
     %{traversed: traversed, errors: errors}
   end
 
-  defp visit({:predicate, :binary?}, value) do
-    if is_binary(value) do
-      %{traversed: [], errors: []}
+  ## Predicates
+
+  defp visit({:predicate, unary_predicate}, value) do
+    errors = if apply(ESchema.PredicateLogic, unary_predicate, [value]) do
+      []
     else
-      %{traversed: [], errors: [[:binary?, value]]}
+      [[unary_predicate]]
+    end
+
+    %{traversed: [], errors: errors}
+  end
+
+  defp visit({:predicate, binary_predicate, arg}, value) do
+    errors = if apply(ESchema.PredicateLogic, binary_predicate, [value, arg]) do
+      []
+    else
+      [[binary_predicate]]
+    end
+
+    %{traversed: [], errors: errors}
+  end
+
+  ## Boolean operators
+
+  defp visit({:conjunction, left, right}, params) do
+    %{traversed: traversed_by_left, errors: errors_by_left} = visit(left, params)
+
+    if errors_by_left == [] do
+      %{traversed: traversed_by_right, errors: errors_by_right} = visit(right, params)
+
+      traversed = traversed_by_left ++ traversed_by_right
+      errors = errors_by_right
+      %{traversed: traversed, errors: errors}
+    else
+      %{traversed: traversed_by_left, errors: errors_by_left}
     end
   end
 
-  defp visit({:predicate, :format?, regex}, value) do
-    if Regex.match?(regex, value) do
-      %{traversed: [], errors: []}
+  defp visit({:disjunction, _left, _right}, _params), do: raise "Not Implemented"
+
+  defp visit({:implication, left, right}, params) do
+    %{traversed: traversed_by_left, errors: errors_by_left} = visit(left, params)
+
+    if errors_by_left == [] do
+      %{traversed: traversed_by_right, errors: errors_by_right} = visit(right, params)
+
+      traversed = traversed_by_left ++ traversed_by_right
+      errors = errors_by_right
+      %{traversed: traversed, errors: errors}
     else
-      %{traversed: [], errors: [[:format?, regex, value]]}
+      %{traversed: traversed_by_left, errors: []}
     end
   end
 
-  defp visit({:predicate, :size?, size}, value) when is_integer(size) do
-    if _length_of(value) == size do
-      %{traversed: [], errors: []}
-    else
-      %{traversed: [], errors: [[:size?, size, value]]}
-    end
-  end
+  defp visit({:exclusive_disjunction, _left, _right}, _params), do: raise "Not Implemented"
 
-  defp visit({:predicate, :size?, range}, value) do
-    if Enum.member?(range, _length_of(value)) do
-      %{traversed: [], errors: []}
-    else
-      %{traversed: [], errors: [[:size?, range, value]]}
-    end
-  end
+  # ...
 
-  defp _length_of(value) when is_list(value), do: length(value)
-  defp _length_of(value) when is_binary(value), do: String.length(value)
-
-  defp merge_result(items) do
+  defp merge(items) do
     Enum.reduce(items, %{traversed: [], errors: []}, fn(item, result) ->
       %{traversed: item_traversed, errors: item_errors} = item
       %{traversed: result_traversed, errors: result_errors} = result
@@ -105,7 +100,7 @@ defmodule ESchema.Validator do
     {:ok, params}
   end
 
-  defp to_result(%{errors: _errors, traversed: _traversed}, _params) do
-    raise "TBD"
+  defp to_result(%{errors: errors, traversed: _traversed}, _params) do
+    raise "Don't know how to collect errors: #{inspect(errors)}"
   end
 end

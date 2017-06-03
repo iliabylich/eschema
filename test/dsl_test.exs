@@ -23,7 +23,6 @@ defmodule ESchema.DSLTest do
     rule do: map?()
     rule do: boolean?()
     rule do: integer?()
-    rule do: tuple?()
 
     ## Boolean operations
     rule do: :left && :right
@@ -47,8 +46,8 @@ defmodule ESchema.DSLTest do
     rule do: min_size?(7)
     rule do: size?(8)
     rule do: format?(~r/\w+/)
-    rule do: included_in?(9..10)
-    rule do: excluded_from?(11..12)
+    rule do: included_in?([9, 10])
+    rule do: excluded_from?([11, 12])
 
     ## Traversing
     rule do: traverse :key, do: eql?("value")
@@ -79,7 +78,6 @@ defmodule ESchema.DSLTest do
       {:rule, {:predicate, :map?}},
       {:rule, {:predicate, :boolean?}},
       {:rule, {:predicate, :integer?}},
-      {:rule, {:predicate, :tuple?}},
 
       {:rule, {:conjunction, :left, :right}},
       {:rule, {:disjunction, :left, :right}},
@@ -100,8 +98,8 @@ defmodule ESchema.DSLTest do
       {:rule, {:predicate, :min_size?, 7}},
       {:rule, {:predicate, :size?, 8}},
       {:rule, {:predicate, :format?, ~r/\w+/}},
-      {:rule, {:predicate, :included_in?, 9..10}},
-      {:rule, {:predicate, :excluded_from?, 11..12}},
+      {:rule, {:predicate, :included_in?, [9, 10]}},
+      {:rule, {:predicate, :excluded_from?, [11, 12]}},
 
       {:rule, {:traverse, :key, {:predicate, :eql?, "value"}}},
 

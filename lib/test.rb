@@ -1,7 +1,7 @@
 require 'dry-validation'
 
 UserSchema = Dry::Validation.Schema do
-  required(:a) { int? }
+  required(:a) { gt?(5) }
 end
 
-p UserSchema.rules
+p UserSchema.call(a: "asd")
