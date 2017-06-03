@@ -1,8 +1,6 @@
 defmodule ESchema.Validator do
   def call(schema, params) do
-    schema.rules
-    |> Enum.map(fn({:rule, rule}) -> visit(rule, params) end)
-    |> merge
+    visit({:schema, schema}, params)
     |> to_result(params)
   end
 
@@ -84,7 +82,13 @@ defmodule ESchema.Validator do
 
   defp visit({:exclusive_disjunction, _left, _right}, _params), do: raise "Not Implemented"
 
-  # ...
+  ## Nested schemas support
+
+  defp visit({:schema, schema}, params) do
+    schema.rules
+    |> Enum.map(fn({:rule, rule}) -> visit(rule, params) end)
+    |> merge
+  end
 
   defp merge(items) do
     Enum.reduce(items, %{traversed: [], errors: []}, fn(item, result) ->

@@ -1,12 +1,15 @@
 defmodule ESchema.Whitelist do
   def call(traversed, params) do
-    # IO.inspect traversed
     traversed
     |> Enum.map(fn(traversed_item) -> visit(traversed_item, params) end)
     |> Enum.reduce(%{}, fn(item, acc) -> Map.merge(acc, item) end)
   end
 
-  defp visit([key, nested], params) do
+  defp visit([head | tail], params) when is_list(head) do
+    Map.merge(visit(head, params), visit(tail, params))
+  end
+
+  defp visit([key | nested], params) when is_atom(key) do
     value = if Map.has_key?(params, key) do
       Map.get(params, key)
     else
