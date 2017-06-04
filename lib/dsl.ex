@@ -18,6 +18,10 @@ defmodule ESchema.DSL do
       def rules,   do: @rules
       def customs, do: @customs
 
+      def call(params) do
+        ESchema.Validator.call(__MODULE__, params)
+      end
+
       # TODO: validate that all custom predicates are available
     end
   end

@@ -8,11 +8,11 @@ defmodule ESchema.ValidatorTest do
     required :age, do: integer?() && gt?(18) && lt?(100)
   end
 
-  # defmodule FriendSchema do
-  #   use Schema.DSL
+  defmodule FriendSchema do
+    use ESchema.DSL
 
-  #   required :name, do: binary?()
-  # end
+    required :name, do: binary?()
+  end
 
   defmodule UserSchema do
     use ESchema.DSL
@@ -21,7 +21,7 @@ defmodule ESchema.ValidatorTest do
     required :password, do: binary?() && size?(8..10)
     optional :profile, do: schema?(ProfileSchema)
     optional :tags, do: each do: binary?()
-    # optional :friends, do: each do: schema?(FriendSchema)
+    optional :friends, do: each do: schema?(FriendSchema)
   end
 
   use ExUnit.Case
@@ -36,8 +36,13 @@ defmodule ESchema.ValidatorTest do
     assert Validator.call(UserSchema, params) == {:ok, %{email: "email@email.com", password: "password", profile: %{name: "Name", age: 35}}}
   end
 
-  test "nested arrays of primitives" do
+  test "nested valid arrays of primitives" do
     params = %{"email" => "email@email.com", "password" => "password", "tags" => ["a", "b"]}
     assert Validator.call(UserSchema, params) == {:ok, %{email: "email@email.com", password: "password", tags: ["a", "b"]}}
+  end
+
+  test "nested valid arrays of schemas" do
+    params = %{"email" => "email@email.com", "password" => "password", "friends" => [%{"name" => "f1"}, %{"name" => "f2"}]}
+    assert Validator.call(UserSchema, params) == {:ok, %{email: "email@email.com", password: "password", friends: [%{name: "f1"}, %{name: "f2"}]}}
   end
 end
