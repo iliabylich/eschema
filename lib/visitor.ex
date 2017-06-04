@@ -16,25 +16,10 @@ defmodule ESchema.Visitor do
 
   ## Traversing
 
-  def call({:predicate, :has_key?, key}, params) do
-    {has_key, value} = cond do
-      Map.has_key?(params, key)                 -> {true, Map.get(params, key)}
-      Map.has_key?(params, Atom.to_string(key)) -> {true, Map.get(params, Atom.to_string(key))}
-      true -> {false, nil}
-    end
+  def call({:traverse, key, rule}, params) do
+    nested = Map.get(params, key) || Map.get(params, Atom.to_string(key))
 
-    if has_key do
-      {:ok, value}
-    else
-      {:errors, [:has_key?, key]}
-    end
-  end
-
-  def call({:traverse, key, nested_rule}, params) do
-    nested_params = Map.get(params, key)
-    nested_params = if nested_params == nil, do: Map.get(params, Atom.to_string(key))
-
-    case call(nested_rule, nested_params) do
+    case call(rule, nested) do
       {:ok, sanitized} ->
         {:ok, %{key => sanitized}}
       errors -> errors
@@ -63,9 +48,9 @@ defmodule ESchema.Visitor do
 
   def call({:conjunction, left, right}, params) do
     case call(left, params) do
-      {:ok, sanitized_left} ->
+      {:ok, _} ->
         case call(right, params) do
-          {:ok, sanitized_right} = result -> result
+          {:ok, _} = result -> result
           errors -> errors
         end
       errors -> errors
@@ -76,18 +61,25 @@ defmodule ESchema.Visitor do
 
   def call({:implication, left, right}, params) do
     case call(left, params) do
-      {:ok, sanitized_left} ->
+      {:ok, _} ->
         case call(right, params) do
-          {:ok, sanitized_right} = result -> result
+          {:ok, _} = result -> result
           errors -> errors
         end
-      errors -> {:ok, %{}}
+      _ -> {:ok, %{}}
     end
   end
 
   def call({:exclusive_disjunction, _left, _right}, _params), do: raise "Not Implemented"
 
-  ## Nested Schemas
+  ## Arrays support
+
+  def call({:each, nested}, list) do
+    list
+    |> Enum.map(fn(item) -> call(nested, item) end)
+    |> Enum.split_with(&_has_error?/1)
+    |> _merge_lsit_output
+  end
 
   defp _has_error?({:ok, _}), do: false
   defp _has_error?({:errors, _}), do: true
@@ -101,15 +93,6 @@ defmodule ESchema.Visitor do
     else
       {:errors, errors}
     end
-  end
-
-  ## Arrays support
-
-  def call({:each, nested}, list) do
-    list
-    |> Enum.map(fn(item) -> call(nested, item) end)
-    |> Enum.split_with(&_has_error?/1)
-    |> _merge_lsit_output
   end
 
   def _merge_lsit_output({errors, outputs}) do

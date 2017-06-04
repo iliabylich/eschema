@@ -57,4 +57,8 @@ defmodule ESchema.PredicateLogic do
   def included_in?(value, list), do: Enum.member?(list, value)
 
   def excluded_from?(value, list), do: not included_in?(value, list)
+
+  def has_key?(map, key) do
+    Map.has_key?(map, key) or Map.has_key?(map, Atom.to_string(key))
+  end
 end
