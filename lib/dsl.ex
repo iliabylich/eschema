@@ -1,4 +1,6 @@
 defmodule ESchema.DSL do
+  alias ESchema.Validator
+
   import Kernel, except: [&&: 2, ||: 2, >: 2, ^: 2]
 
   defmacro __using__(_options) do
@@ -19,7 +21,7 @@ defmodule ESchema.DSL do
       def customs, do: @customs
 
       def call(params) do
-        ESchema.Validator.call(__MODULE__, params)
+        Validator.call(__MODULE__, params)
       end
 
       # TODO: validate that all custom predicates are available
@@ -71,21 +73,65 @@ defmodule ESchema.DSL do
 
   ## Predefined checks
 
-  def none?,                                        do: {:predicate, :none?}
-  def eql?(value),                                  do: {:predicate, :eql?, value}
-  def empty?,                                       do: {:predicate, :empty?}
-  def filled?,                                      do: {:predicate, :filled?}
-  def gt?(value)            when is_number(value),  do: {:predicate, :gt?, value}
-  def gteq?(value)          when is_number(value),  do: {:predicate, :gteq?, value}
-  def lt?(value)            when is_number(value),  do: {:predicate, :lt?, value}
-  def lteq?(value)          when is_number(value),  do: {:predicate, :lteq?, value}
-  def max_size?(value)      when is_integer(value), do: {:predicate, :max_size?, value}
-  def min_size?(value)      when is_integer(value), do: {:predicate, :min_size?, value}
-  def size?(value)          when is_integer(value), do: {:predicate, :size_exactly?, value}
-  def size?(%Range{} = value),                      do: {:predicate, :size_between?, value}
-  def format?(value),                               do: {:predicate, :format?, value}
-  def included_in?(value)   when is_list(value),    do: {:predicate, :included_in?, value}
-  def excluded_from?(value) when is_list(value),    do: {:predicate, :excluded_from?, value}
+  def none? do
+    {:predicate, :none?}
+  end
+
+  def eql?(value) do
+    {:predicate, :eql?, value}
+  end
+
+  def empty? do
+    {:predicate, :empty?}
+  end
+
+  def filled? do
+    {:predicate, :filled?}
+  end
+
+  def gt?(value) when is_number(value) do
+    {:predicate, :gt?, value}
+  end
+
+  def gteq?(value) when is_number(value) do
+    {:predicate, :gteq?, value}
+  end
+
+  def lt?(value) when is_number(value) do
+    {:predicate, :lt?, value}
+  end
+
+  def lteq?(value) when is_number(value) do
+    {:predicate, :lteq?, value}
+  end
+
+  def max_size?(value) when is_integer(value) do
+    {:predicate, :max_size?, value}
+  end
+
+  def min_size?(value) when is_integer(value) do
+    {:predicate, :min_size?, value}
+  end
+
+  def size?(value) when is_integer(value) do
+    {:predicate, :size_exactly?, value}
+  end
+
+  def size?(%Range{} = value) do
+    {:predicate, :size_between?, value}
+  end
+
+  def format?(value) do
+    {:predicate, :format?, value}
+  end
+
+  def included_in?(value) when is_list(value) do
+    {:predicate, :included_in?, value}
+  end
+
+  def excluded_from?(value) when is_list(value) do
+    {:predicate, :excluded_from?, value}
+  end
 
   ## Traversing
 
@@ -103,13 +149,17 @@ defmodule ESchema.DSL do
 
   defmacro required(key, do: block) do
     quote do
-      rule do: has_key?(unquote(key)) && traverse(unquote(key), do: unquote(block))
+      rule do
+        has_key?(unquote(key)) && traverse(unquote(key), do: unquote(block))
+      end
     end
   end
 
   defmacro optional(key, do: block) do
     quote do
-      rule do: has_key?(unquote(key)) > traverse(unquote(key), do: unquote(block))
+      rule do
+        has_key?(unquote(key)) > traverse(unquote(key), do: unquote(block))
+      end
     end
   end
 

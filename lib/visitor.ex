@@ -57,7 +57,9 @@ defmodule ESchema.Visitor do
     end
   end
 
-  def call({:disjunction, _left, _right}, _params), do: raise "Not Implemented"
+  def call({:disjunction, _left, _right}, _params) do
+    raise "Not Implemented"
+  end
 
   def call({:implication, left, right}, params) do
     case call(left, params) do
@@ -70,7 +72,9 @@ defmodule ESchema.Visitor do
     end
   end
 
-  def call({:exclusive_disjunction, _left, _right}, _params), do: raise "Not Implemented"
+  def call({:exclusive_disjunction, _left, _right}, _params) do
+    raise "Not Implemented"
+  end
 
   ## Arrays support
 
@@ -85,10 +89,14 @@ defmodule ESchema.Visitor do
   defp _has_error?({:errors, _}), do: true
 
   def _merge_schema_output({errors, outputs}) do
-    errors = Enum.reduce(errors, [], fn({:errors, item}, acc) -> [item] ++ acc end)
+    errors = Enum.reduce(errors, [], fn({:errors, item}, acc) ->
+      [item] ++ acc
+    end)
 
     if errors == [] do
-      output = Enum.reduce(outputs, %{}, fn({:ok, item}, acc) -> Map.merge(acc, item) end)
+      output = Enum.reduce(outputs, %{}, fn({:ok, item}, acc) ->
+        Map.merge(acc, item)
+      end)
       {:ok, output}
     else
       {:errors, errors}
@@ -96,10 +104,12 @@ defmodule ESchema.Visitor do
   end
 
   def _merge_lsit_output({errors, outputs}) do
-    errors = Enum.reduce(errors, [], fn({:errors, item}, acc) -> [item] ++ acc end)
+    errors = Enum.reduce(errors, [], fn({:errors, item}, acc) ->
+      acc ++ [item]
+    end)
 
     if errors == [] do
-      output = Enum.reduce(outputs, [], fn({:ok, item}, acc) -> acc ++ [item] end)
+      output = Enum.map(outputs, fn({:ok, item}) -> item end)
       {:ok, output}
     else
       {:errors, errors}
