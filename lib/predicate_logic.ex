@@ -1,4 +1,5 @@
 defmodule ESchema.PredicateLogic do
+  @moduledoc false
 
   ## Primitive type checks
 

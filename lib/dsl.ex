@@ -1,4 +1,20 @@
 defmodule ESchema.DSL do
+  @moduledoc """
+  ESchema.DSL provides a DSL to define your own schemas.
+
+  ## Examples
+
+    defmodule UserSchema do
+      use ESchema.DSL
+
+      required(:username), do: binary?() && max_length?(10)
+      optional(:age), do: integer?() && gteq?(18)
+    end
+
+    iex> UserSchema.call(%{"username" => "john1985", "age" => 25})
+    {:ok, %{username: "john1985", age: 25}}
+  """
+
   alias ESchema.Validator
 
   import Kernel, except: [&&: 2, ||: 2, >: 2, ^: 2]

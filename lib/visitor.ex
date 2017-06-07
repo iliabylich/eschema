@@ -1,4 +1,6 @@
 defmodule ESchema.Visitor do
+  @moduledoc false
+
   ## Schema handling
 
   def call({:schema, schema}, params) do

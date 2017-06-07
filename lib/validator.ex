@@ -1,4 +1,6 @@
 defmodule ESchema.Validator do
+  @moduledoc false
+
   alias ESchema.Visitor
 
   def call(schema, params) do
