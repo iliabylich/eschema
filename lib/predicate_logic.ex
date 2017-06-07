@@ -20,7 +20,7 @@ defmodule ESchema.PredicateLogic do
 
   def empty?(value), do: value == "" or value == [] or value == %{}
 
-  def filled?(value), do: value != nil and value != "" and value != [] and value != %{}
+  def filled?(value), do: not(none?(value) or empty?(value))
 
   def gt?(value, cmp) when is_number(value), do: value > cmp
   def gt?(value, _), do: raise "gt? can compare only numbers (got #{inspect(value)})"
@@ -34,12 +34,10 @@ defmodule ESchema.PredicateLogic do
   def lteq?(value, cmp) when is_number(value), do: value <= cmp
   def lteq?(value, _), do: raise "lteq? can compare only numbers (got #{inspect(value)})"
 
-  def max_size?(value, size) when is_list(value), do: length(value) <= size
-  def max_size?(value, size) when is_binary(value), do: String.length(value) <= size
+  def max_size?(value, size) when is_list(value) or is_binary(value), do: _length(value) <= size
   def max_size?(value, _), do: raise "max_size? is supported only by list and binary (got #{inspect(value)})"
 
-  def min_size?(value, size) when is_list(value), do: length(value) >= size
-  def min_size?(value, size) when is_binary(value), do: String.length(value) >= size
+  def min_size?(value, size) when is_list(value) or is_binary(value), do: _length(value) >= size
   def min_size?(value, _), do: raise "min_size? is supported only by list and binary (got #{inspect(value)})"
 
   def size_exactly?(value, size) when is_binary(value) or is_list(value), do: _length(value) == size
