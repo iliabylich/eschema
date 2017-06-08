@@ -24,7 +24,7 @@ defmodule ESchema.Visitor do
     case call(rule, nested) do
       {:ok, sanitized} ->
         {:ok, %{key => sanitized}}
-      errors -> errors
+      {:error, errors} -> {:error, [:key, key, errors]}
     end
   end
 
@@ -34,7 +34,7 @@ defmodule ESchema.Visitor do
     if apply(ESchema.PredicateLogic, unary_predicate, [value]) do
       {:ok, value}
     else
-      {:errors, [unary_predicate]}
+      {:error, [unary_predicate]}
     end
   end
 
@@ -42,7 +42,7 @@ defmodule ESchema.Visitor do
     if apply(ESchema.PredicateLogic, binary_predicate, [value, arg]) do
       {:ok, value}
     else
-      {:errors, [binary_predicate, arg]}
+      {:error, [binary_predicate, arg]}
     end
   end
 
@@ -83,38 +83,37 @@ defmodule ESchema.Visitor do
   def call({:each, nested}, list) do
     list
     |> Enum.map(fn(item) -> call(nested, item) end)
+    |> Enum.with_index
+    |> Enum.map(fn
+      ({{:ok, output}, _})      -> {:ok, output}
+      ({{:error, errors}, idx}) -> {:error, [idx, errors]}
+      end)
     |> Enum.split_with(&_has_error?/1)
-    |> _merge_lsit_output
+    |> _merge_array_output
   end
 
   defp _has_error?({:ok, _}), do: false
-  defp _has_error?({:errors, _}), do: true
+  defp _has_error?({:error, _}), do: true
 
-  def _merge_schema_output({errors, outputs}) do
-    errors = Enum.reduce(errors, [], fn({:errors, item}, acc) ->
-      [item] ++ acc
+  def _merge_schema_output({[], outputs}) do
+    output = Enum.reduce(outputs, %{}, fn({:ok, item}, acc) ->
+      Map.merge(acc, item)
     end)
-
-    if errors == [] do
-      output = Enum.reduce(outputs, %{}, fn({:ok, item}, acc) ->
-        Map.merge(acc, item)
-      end)
-      {:ok, output}
-    else
-      {:errors, errors}
-    end
+    {:ok, output}
   end
 
-  def _merge_lsit_output({errors, outputs}) do
-    errors = Enum.reduce(errors, [], fn({:errors, item}, acc) ->
-      acc ++ [item]
-    end)
+  def _merge_schema_output({errors, _}) do
+    errors = Enum.map(errors, fn({:error, item}) -> item end)
+    {:error, errors}
+  end
 
-    if errors == [] do
-      output = Enum.map(outputs, fn({:ok, item}) -> item end)
-      {:ok, output}
-    else
-      {:errors, errors}
-    end
+  def _merge_array_output({[], outputs}) do
+    output = Enum.map(outputs, fn({:ok, item}) -> item end)
+    {:ok, output}
+  end
+
+  def _merge_array_output({errors, _}) do
+    errors = Enum.map(errors, fn({:error, item}) -> item end)
+    {:error, [:array | errors]}
   end
 end

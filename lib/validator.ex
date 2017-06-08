@@ -5,7 +5,7 @@ defmodule ESchema.Validator do
 
   def call(schema, params) do
     case Visitor.call({:schema, schema}, params) do
-      {:errors, _} -> "localized"
+      {:error, _} -> "localized"
       {:ok, _} = success -> success
     end
   end
